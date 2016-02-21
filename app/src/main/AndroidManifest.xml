@@ -30,9 +30,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
-
-
+        <activity android:name=".CameraPreview.ScannerActivity"
+            android:label="Scan barcode">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <provider
             android:name=".data.BookProvider"
             android:authorities="it.jaschke.alexandria"

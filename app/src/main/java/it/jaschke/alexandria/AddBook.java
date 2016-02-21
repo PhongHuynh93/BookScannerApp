@@ -17,8 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.zxing.integration.android.IntentIntegrator;
-
+import it.jaschke.alexandria.CameraPreview.ScannerActivity;
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.services.BookService;
 import it.jaschke.alexandria.services.DownloadImage;
@@ -90,13 +89,12 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             @Override
             public void onClick(View v) {
 
-                IntentIntegrator integrator = new IntentIntegrator(getActivity());
-//                integrator.setDesiredBarcodeFormats(IntentIntegrator.PRODUCT_CODE_TYPES);
-                integrator.setPrompt("Scan your book's barcode");
-                //integrator.setCameraId(0);  // Use a specific camera of the device
-//                integrator.setBeepEnabled(false);
-//                integrator.setBarcodeImageEnabled(true);
-                integrator.initiateScan();
+//                IntentIntegrator integrator = new IntentIntegrator(getActivity());
+//            //    integrator.setDesiredBarcodeFormats(IntentIntegrator.PRODUCT_CODE_TYPES);
+//                integrator.setPrompt("Scan your book's barcode");
+//                integrator.initiateScan();
+                Intent scanIntent = new Intent (getActivity(), ScannerActivity.class);
+                startActivity(scanIntent);
 
             }
         });

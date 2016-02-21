@@ -17,9 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
-
 import it.jaschke.alexandria.api.Callback;
 
 
@@ -183,19 +180,19 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         super.onBackPressed();
     }
 
-    //retrieve scanning results
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (scanningResult != null) {
-            //we have a result
-            String scanContent = scanningResult.getContents();
-            String scanFormat = scanningResult.getFormatName();
-            Toast.makeText(this, "Content: " + scanContent + " Format = " + scanFormat, Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this,"No scan data received! Try again!", Toast.LENGTH_SHORT).show();
-        }
-    }
+//    //retrieve scanning results
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+//        if (scanningResult != null) {
+//            //we have a result
+//            String scanContent = scanningResult.getContents();
+//            String scanFormat = scanningResult.getFormatName();
+//            Toast.makeText(this, "Content: " + scanContent + " Format = " + scanFormat, Toast.LENGTH_SHORT).show();
+//        } else {
+//            Toast.makeText(this,"No scan data received! Try again!", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
 
 }
