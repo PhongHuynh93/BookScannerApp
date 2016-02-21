@@ -1,9 +1,11 @@
 package it.jaschke.alexandria;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import it.jaschke.alexandria.CameraPreview.ScannerActivity;
 import it.jaschke.alexandria.api.Callback;
 
 
@@ -33,6 +36,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     private CharSequence title;
     public static boolean IS_TABLET = false;
     private BroadcastReceiver messageReciever;
+    public static final String PREFS_NAME = "PreferencesFile";
 
     public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
     public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
@@ -194,5 +198,27 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 //        }
 //    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == AddBook.SCAN_REQUEST_CODE) {
+            if(resultCode == Activity.RESULT_OK){
+                String barcode =data.getStringExtra(ScannerActivity.RESULT_BARCODE);
+                String barcodeFormat =data.getStringExtra(ScannerActivity.RESULT_BARCODE_FORMAT);
+
+                Toast.makeText(this, "Contents = " + barcode +
+                        ", Format = " + barcodeFormat, Toast.LENGTH_SHORT).show();
+
+                //save the scanned barcode to shared preferences
+                SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+                editor.putString(ScannerActivity.RESULT_BARCODE, barcode);
+                editor.putString(ScannerActivity.RESULT_BARCODE_FORMAT, barcodeFormat);
+                editor.apply();
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                Toast.makeText(this,"Error: No scan data received! Try again!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
 }

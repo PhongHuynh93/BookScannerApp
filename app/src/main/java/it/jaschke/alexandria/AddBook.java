@@ -2,6 +2,7 @@ package it.jaschke.alexandria;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,6 +26,7 @@ import it.jaschke.alexandria.services.DownloadImage;
 
 public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
+    public static final int SCAN_REQUEST_CODE = 1;
     private EditText ean;
     private final int LOADER_ID = 1;
     private View rootView;
@@ -85,6 +87,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             }
         });
 
+
         rootView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,7 +97,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 //                integrator.setPrompt("Scan your book's barcode");
 //                integrator.initiateScan();
                 Intent scanIntent = new Intent (getActivity(), ScannerActivity.class);
-                startActivity(scanIntent);
+                //the requestCode is changed by the Activity that owns the Fragment, so need to call getActivity()
+                getActivity().startActivityForResult(scanIntent, SCAN_REQUEST_CODE);
 
             }
         });
@@ -125,6 +129,21 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        //check if the scanner returned barcode
+        String barcode = getBarcodeFromSharedPreferences();
+        if(barcode != null){
+            ean.setText(barcode);
+            //clear the SharedPrefs
+            SharedPreferences prefs = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, MainActivity.MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.clear();
+            editor.apply();
+        }
+
+    }
 
     private void restartLoader(){
         getLoaderManager().restartLoader(LOADER_ID, null, this);
@@ -197,5 +216,20 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         activity.setTitle(R.string.scan);
+    }
+
+    private String getBarcodeFromSharedPreferences(){
+        SharedPreferences prefs = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, MainActivity.MODE_PRIVATE);
+        String restoredText = prefs.getString(ScannerActivity.RESULT_BARCODE, null);
+        if (restoredText != null) {
+            String barcode = prefs.getString(ScannerActivity.RESULT_BARCODE, "No barcode");
+            String barcodeFormat = prefs.getString(ScannerActivity.RESULT_BARCODE_FORMAT, "No barcode");
+            if(!barcode.equals("No barcode")){
+                return barcode;
+            } else {
+                return null;
+            }
+        }
+        return null;
     }
 }

@@ -1,10 +1,11 @@
 package it.jaschke.alexandria.CameraPreview;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
@@ -21,6 +22,8 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 public class ScannerActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
     private static final String LOG_TAG = ScannerActivity.class.getSimpleName();
     private ZXingScannerView mScannerView;
+    public static String RESULT_BARCODE = "barcode";
+    public static String RESULT_BARCODE_FORMAT = "barcode_type";
 
     public ScannerActivity() {
         super();
@@ -63,8 +66,8 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
 
     @Override
     public void handleResult(Result rawResult) {
-        Toast.makeText(this, "Contents = " + rawResult.getText() +
-                ", Format = " + rawResult.getBarcodeFormat().toString(), Toast.LENGTH_SHORT).show();
+        String barcodeFormat = rawResult.getBarcodeFormat().toString();
+        String barcode = rawResult.getText();
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -73,5 +76,13 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                 mScannerView.resumeCameraPreview(ScannerActivity.this);
             }
         }, 2000);
+
+        //return to teh main activity barcode scannng results
+        Intent returnIntent = getIntent();
+        returnIntent.putExtra(RESULT_BARCODE,barcode);
+        returnIntent.putExtra(RESULT_BARCODE_FORMAT,barcodeFormat);
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
+
     }
 }
