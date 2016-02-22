@@ -26,6 +26,7 @@ import it.jaschke.alexandria.services.DownloadImage;
 public class BookDetail extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String EAN_KEY = "EAN";
+    public static final String TYPE = "text/plain";
     private final int LOADER_ID = 10;
     private View rootView;
     private String ean;
@@ -97,7 +98,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
 
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-        shareIntent.setType("text/plain");
+        shareIntent.setType(TYPE);
         shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text)+bookTitle);
         shareActionProvider.setShareIntent(shareIntent);
 

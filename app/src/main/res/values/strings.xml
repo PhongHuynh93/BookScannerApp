@@ -13,6 +13,7 @@
     <string name="scan_button">Scan</string>
     <string name="input_hint">Insert ISBN-13. Digits only.</string>
     <string name="book_cover">Bookcover</string>
+    <string name="book_detail_title">Book Detail</string>
 
     <string name="ok_button">Next</string>
     <string name="cancel_button">Cancel</string>
@@ -28,4 +29,16 @@
 <!-- TODO: Remove or change this placeholder text -->
     <string name="about_text">This application gets book information from a Google API. All titles, cover images, and author information come from there.
     The original version of this app was built by Sascha Jaschke, and a modified version is given to students in the Udacity Android Nanodegree program. </string>
+
+    <!-- Error messages -->
+    <string name="error_no_scan_data_received">Error: No scan data received! Try again!</string>
+    <string name="error_no_camera_permission">Please grant camera permission to use the barcode scanner</string>
+    <string name="error_barcode_not_valid">Barcode is not valid</string>
+    <string name="error_no_internet_connection">Can\'t load book\'s information. There is no internet connection.</string>
+    <string name="error_class_cast_exception">Activity must implement NavigationDrawerCallbacks.</string>
+
+    <!-- Preferences default values -->
+    <string name="prefs_result_barcode_default_value" translatable="false">No barcode</string>
+    <string name="prefs_result_format_default_value" translatable="false">No barcode</string>
+
 </resources>

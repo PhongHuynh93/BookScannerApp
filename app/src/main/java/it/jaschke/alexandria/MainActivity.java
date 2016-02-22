@@ -159,7 +159,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }
         getSupportFragmentManager().beginTransaction()
                 .replace(id, fragment)
-                .addToBackStack("Book Detail")
+                .addToBackStack(getString(R.string.book_detail_title))
                 .commit();
 
     }
@@ -206,12 +206,12 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 editor.apply();
             }
             if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(this, "Error: No scan data received! Try again!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.error_no_scan_data_received, Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private void checkIfCameraPermissionGranted() {
+    public void checkIfCameraPermissionGranted() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -231,7 +231,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                     editor.putBoolean(CAMERA_PERMISSION, true);
                     editor.apply();
                 } else {
-                    Toast.makeText(this, "Please grant camera permission to use the QR Scanner",
+                    Toast.makeText(this, R.string.error_no_camera_permission,
                             Toast.LENGTH_SHORT).show();
                 }
                 return;

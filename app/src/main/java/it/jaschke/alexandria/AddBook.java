@@ -14,7 +14,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -104,10 +103,17 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             @Override
             public void onClick(View v) {
 
-                Intent scanIntent = new Intent (getActivity(), ScannerActivity.class);
-                //the requestCode is changed by the Activity that owns the Fragment, so need to call getActivity()
-                getActivity().startActivityForResult(scanIntent, SCAN_REQUEST_CODE);
-
+                //check if camera permission granted
+                SharedPreferences prefs = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, MainActivity.MODE_PRIVATE);
+                boolean permissionGranted = prefs.getBoolean(MainActivity.CAMERA_PERMISSION, false);
+                if(permissionGranted){
+                    Intent scanIntent = new Intent (getActivity(), ScannerActivity.class);
+                    //the requestCode is changed by the Activity that owns the Fragment, so need to call getActivity()
+                    getActivity().startActivityForResult(scanIntent, SCAN_REQUEST_CODE);
+                }
+                else {
+                    Toast.makeText(getContext(), R.string.error_no_camera_permission, Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -151,7 +157,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
         if(!Utility.validateEAN(barcode)){
             clearFields();
-            Toast.makeText(getContext(), "Barcode is not valid", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.error_barcode_not_valid, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -165,7 +171,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             AddBook.this.restartLoader();
         } else {
             Toast.makeText(getActivity(),
-                    "Can't load book's information. There is no internet connection.",
+                    R.string.error_no_internet_connection,
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -273,7 +279,6 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     @Override
     public void onAttach(Activity activity) {
-        Log.d(TAG, "onAttach()");
         super.onAttach(activity);
         activity.setTitle(R.string.scan);
     }
@@ -282,9 +287,11 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         SharedPreferences prefs = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, MainActivity.MODE_PRIVATE);
         String restoredText = prefs.getString(ScannerActivity.RESULT_BARCODE, null);
         if (restoredText != null) {
-            String barcode = prefs.getString(ScannerActivity.RESULT_BARCODE, "No barcode");
-            String barcodeFormat = prefs.getString(ScannerActivity.RESULT_BARCODE_FORMAT, "No barcode");
-            if(!barcode.equals("No barcode")){
+            String barcode = prefs.getString(ScannerActivity.RESULT_BARCODE,
+                    getActivity().getString(R.string.prefs_result_barcode_default_value));
+            String barcodeFormat = prefs.getString(ScannerActivity.RESULT_BARCODE_FORMAT,
+                    getActivity().getString(R.string.prefs_result_format_default_value));
+            if(!barcode.equals(getActivity().getString(R.string.prefs_result_barcode_default_value))){
                 return barcode;
             } else {
                 return null;
