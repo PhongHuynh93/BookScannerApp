@@ -1,9 +1,13 @@
 package it.jaschke.alexandria;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -17,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import it.jaschke.alexandria.CameraPreview.ScannerActivity;
 import it.jaschke.alexandria.data.AlexandriaContract;
@@ -38,6 +43,14 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private String mScanContents = "Contents:";
 
 
+    private IntentFilter mIntentFilter;
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            loadBooksIfBarcodeValid();
+        }
+    };
+
 
     public AddBook(){
     }
@@ -47,6 +60,19 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         super.onSaveInstanceState(outState);
         if(ean!=null) {
             outState.putString(EAN_CONTENT, ean.getText().toString());
+        }
+    }
+
+    /**
+     * Noticed that when rotating fragment do not store the data
+     * @param savedInstanceState
+     */
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            // Restore last state for checked position.
+            ean.setText(EAN_CONTENT,null);
         }
     }
 
@@ -69,33 +95,37 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
             @Override
             public void afterTextChanged(Editable s) {
-                String ean =s.toString();
-                //catch isbn10 numbers
-                if(ean.length()==10 && !ean.startsWith("978")){
-                    ean="978"+ean;
-                }
-                if(ean.length()<13){
-                    clearFields();
-                    return;
-                }
-                //Once we have an ISBN, start a book intent
-                Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean);
-                bookIntent.setAction(BookService.FETCH_BOOK);
-                getActivity().startService(bookIntent);
-                AddBook.this.restartLoader();
+//                String ean =s.toString();
+//                //catch isbn10 numbers
+//                 Utility.fixISBN10(ean);
+//
+//                if(!Utility.validateEAN(ean)){
+//                    clearFields();
+//                    Toast.makeText(getContext(), "Barcode is not valid", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                //Once we have an ISBN, start a book intent
+//
+//                //check if there is an internet connection
+//                if(Utility.isNetworkAvailable(getActivity())){
+//                    Intent bookIntent = new Intent(getActivity(), BookService.class);
+//                    bookIntent.putExtra(BookService.EAN, ean);
+//                    bookIntent.setAction(BookService.FETCH_BOOK);
+//                    getActivity().startService(bookIntent);
+//                    AddBook.this.restartLoader();
+//                } else {
+//                    Toast.makeText(getActivity(),
+//                            "Can't load book's information. There is no internet connection.",
+//                            Toast.LENGTH_SHORT).show();
+//                }
+                loadBooksIfBarcodeValid();
             }
         });
-
 
         rootView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-//                IntentIntegrator integrator = new IntentIntegrator(getActivity());
-//            //    integrator.setDesiredBarcodeFormats(IntentIntegrator.PRODUCT_CODE_TYPES);
-//                integrator.setPrompt("Scan your book's barcode");
-//                integrator.initiateScan();
                 Intent scanIntent = new Intent (getActivity(), ScannerActivity.class);
                 //the requestCode is changed by the Activity that owns the Fragment, so need to call getActivity()
                 getActivity().startActivityForResult(scanIntent, SCAN_REQUEST_CODE);
@@ -129,6 +159,39 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         return rootView;
     }
 
+    /**
+     * Updates the UI. Updates the list of books by the barcode in the
+     * textview
+     */
+    private void loadBooksIfBarcodeValid(){
+        String barcode = ean.getText().toString();
+        if(barcode.equals("")){
+            return;
+        }
+
+        barcode = Utility.fixISBN10(barcode);
+
+        if(!Utility.validateEAN(barcode)){
+            clearFields();
+            Toast.makeText(getContext(), "Barcode is not valid", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        //load the list of the books
+        //check if there is an internet connection
+        if(Utility.isNetworkAvailable(getActivity())){
+            Intent bookIntent = new Intent(getActivity(), BookService.class);
+            bookIntent.putExtra(BookService.EAN, barcode);
+            bookIntent.setAction(BookService.FETCH_BOOK);
+            getActivity().startService(bookIntent);
+            AddBook.this.restartLoader();
+        } else {
+            Toast.makeText(getActivity(),
+                    "Can't load book's information. There is no internet connection.",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -142,6 +205,18 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             editor.clear();
             editor.apply();
         }
+
+        //register the receiver
+        mIntentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(mReceiver, mIntentFilter);
+    }
+
+
+    @Override
+    public void onPause() {
+        //unregister the connectivity manager
+        getActivity().unregisterReceiver(mReceiver);
+        super.onPause();
 
     }
 

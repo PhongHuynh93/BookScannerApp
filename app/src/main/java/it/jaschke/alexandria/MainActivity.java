@@ -40,6 +40,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
     public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
+    private static final int ZXING_CAMERA_PERMISSION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +63,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
         // Set up the drawer.
         navigationDrawerFragment.setUp(R.id.navigation_drawer,
-                    (DrawerLayout) findViewById(R.id.drawer_layout));
+                (DrawerLayout) findViewById(R.id.drawer_layout));
 
     }
 
@@ -184,20 +185,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         super.onBackPressed();
     }
 
-//    //retrieve scanning results
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-//        if (scanningResult != null) {
-//            //we have a result
-//            String scanContent = scanningResult.getContents();
-//            String scanFormat = scanningResult.getFormatName();
-//            Toast.makeText(this, "Content: " + scanContent + " Format = " + scanFormat, Toast.LENGTH_SHORT).show();
-//        } else {
-//            Toast.makeText(this,"No scan data received! Try again!", Toast.LENGTH_SHORT).show();
-//        }
-//    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -205,9 +192,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             if(resultCode == Activity.RESULT_OK){
                 String barcode =data.getStringExtra(ScannerActivity.RESULT_BARCODE);
                 String barcodeFormat =data.getStringExtra(ScannerActivity.RESULT_BARCODE_FORMAT);
-
-                Toast.makeText(this, "Contents = " + barcode +
-                        ", Format = " + barcodeFormat, Toast.LENGTH_SHORT).show();
 
                 //save the scanned barcode to shared preferences
                 SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();

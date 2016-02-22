@@ -145,9 +145,7 @@ public class BookService extends IntentService {
         }
 
         final String ITEMS = "items";
-
         final String VOLUME_INFO = "volumeInfo";
-
         final String TITLE = "title";
         final String SUBTITLE = "subtitle";
         final String AUTHORS = "authors";
