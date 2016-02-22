@@ -1,15 +1,19 @@
 package it.jaschke.alexandria;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -37,6 +41,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     public static boolean IS_TABLET = false;
     private BroadcastReceiver messageReciever;
     public static final String PREFS_NAME = "PreferencesFile";
+    public static final String CAMERA_PERMISSION = "CameraPermission";
 
     public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
     public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
@@ -47,15 +52,15 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         super.onCreate(savedInstanceState);
 
         IS_TABLET = isTablet();
-        if(IS_TABLET){
+        if (IS_TABLET) {
             setContentView(R.layout.activity_main_tablet);
-        }else {
+        } else {
             setContentView(R.layout.activity_main);
         }
 
         messageReciever = new MessageReciever();
         IntentFilter filter = new IntentFilter(MESSAGE_EVENT);
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageReciever,filter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(messageReciever, filter);
 
         navigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -73,12 +78,13 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment nextFragment;
 
-        switch (position){
+        switch (position) {
             default:
             case 0:
                 nextFragment = new ListOfBooks();
                 break;
             case 1:
+                checkIfCameraPermissionGranted();
                 nextFragment = new AddBook();
                 break;
             case 2:
@@ -148,7 +154,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         fragment.setArguments(args);
 
         int id = R.id.container;
-        if(findViewById(R.id.right_container) != null){
+        if (findViewById(R.id.right_container) != null) {
             id = R.id.right_container;
         }
         getSupportFragmentManager().beginTransaction()
@@ -161,13 +167,13 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     private class MessageReciever extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getStringExtra(MESSAGE_KEY)!=null){
+            if (intent.getStringExtra(MESSAGE_KEY) != null) {
                 Toast.makeText(MainActivity.this, intent.getStringExtra(MESSAGE_KEY), Toast.LENGTH_LONG).show();
             }
         }
     }
 
-    public void goBack(View view){
+    public void goBack(View view) {
         getSupportFragmentManager().popBackStack();
     }
 
@@ -179,7 +185,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     @Override
     public void onBackPressed() {
-        if(getSupportFragmentManager().getBackStackEntryCount()<2){
+        if (getSupportFragmentManager().getBackStackEntryCount() < 2) {
             finish();
         }
         super.onBackPressed();
@@ -189,9 +195,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == AddBook.SCAN_REQUEST_CODE) {
-            if(resultCode == Activity.RESULT_OK){
-                String barcode =data.getStringExtra(ScannerActivity.RESULT_BARCODE);
-                String barcodeFormat =data.getStringExtra(ScannerActivity.RESULT_BARCODE_FORMAT);
+            if (resultCode == Activity.RESULT_OK) {
+                String barcode = data.getStringExtra(ScannerActivity.RESULT_BARCODE);
+                String barcodeFormat = data.getStringExtra(ScannerActivity.RESULT_BARCODE_FORMAT);
 
                 //save the scanned barcode to shared preferences
                 SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
@@ -200,8 +206,35 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 editor.apply();
             }
             if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(this,"Error: No scan data received! Try again!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error: No scan data received! Try again!", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    private void checkIfCameraPermissionGranted() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    ZXING_CAMERA_PERMISSION);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case ZXING_CAMERA_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //save information about the permission granted to shared prefs
+                    SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+                    editor.putBoolean(CAMERA_PERMISSION, true);
+                    editor.apply();
+                } else {
+                    Toast.makeText(this, "Please grant camera permission to use the QR Scanner",
+                            Toast.LENGTH_SHORT).show();
+                }
+                return;
         }
     }
 

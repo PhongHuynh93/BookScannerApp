@@ -4,18 +4,21 @@
 
     <RelativeLayout
         android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_gravity="center_horizontal|top">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal|top"
+        android:layout_marginLeft="@dimen/paddingLeftRight">
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:id="@+id/eancontainer"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true">
+            android:layout_centerHorizontal="true"
+            android:paddingLeft="@dimen/paddingLeftRight"
+            android:paddingRight="@dimen/paddingLeftRight">
 
             <EditText
                 android:layout_width="wrap_content"
@@ -27,7 +30,7 @@
                 android:maxLength="@integer/ean_size"
                 android:maxLines="1"
                 android:hint="@string/input_hint"
-                android:paddingRight="20dp"/>
+                android:layout_marginRight="20dp"/>
 
             <Button
                 android:layout_width="wrap_content"
@@ -56,6 +59,7 @@
             android:id="@+id/bookSubTitle"
             android:layout_marginTop="10dp"
             android:layout_below="@+id/bookTitle"
+            android:layout_marginRight="@dimen/paddingLeftRight"
             android:maxLines="3"
             android:ellipsize="end"
             android:layout_alignLeft="@+id/eancontainer"
@@ -68,6 +72,7 @@
             android:gravity="end"
             android:textSize="@dimen/small_fontsize"
             android:layout_marginTop="20dp"
+            android:layout_marginRight="@dimen/paddingLeftRight"
             android:layout_below="@+id/bookSubTitle"
             android:layout_alignRight="@+id/eancontainer"
             android:layout_alignEnd="@+id/eancontainer"
@@ -94,7 +99,7 @@
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="50dip"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
@@ -102,7 +107,7 @@
 
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
+                android:layout_height="match_parent"
                 android:text="@string/cancel_button"
                 android:layout_weight="1"
                 style="?android:attr/buttonBarButtonStyle"
@@ -113,7 +118,7 @@
 
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
+                android:layout_height="match_parent"
                 android:text="@string/ok_button"
                 android:visibility="invisible"
                 android:layout_weight="1"
