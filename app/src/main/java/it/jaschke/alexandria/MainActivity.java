@@ -46,6 +46,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
     public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
     private static final int ZXING_CAMERA_PERMISSION = 1;
+    private static final String FRAGMENT_TAG = "MainActivityFragment";
+
+    private Fragment mCurrentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +73,12 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         navigationDrawerFragment.setUp(R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
+        if(savedInstanceState != null){
+            //Restore the fragment's instance
+            mCurrentFragment = getSupportFragmentManager().getFragment(savedInstanceState, FRAGMENT_TAG);
+        }
+        checkIfCameraPermissionGranted();
+
     }
 
     @Override
@@ -92,6 +101,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 break;
 
         }
+
+        mCurrentFragment = nextFragment;
 
         fragmentManager.beginTransaction()
                 .replace(R.id.container, nextFragment)
@@ -208,6 +219,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             if (resultCode == Activity.RESULT_CANCELED) {
                 Toast.makeText(this, R.string.error_no_scan_data_received, Toast.LENGTH_SHORT).show();
             }
+            savePermissionState(true);
         }
     }
 
@@ -218,6 +230,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA},
                     ZXING_CAMERA_PERMISSION);
+        } else {
+            //save information about the permission granted to shared prefs
+            savePermissionState(true);
         }
     }
 
@@ -227,15 +242,25 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             case ZXING_CAMERA_PERMISSION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //save information about the permission granted to shared prefs
-                    SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
-                    editor.putBoolean(CAMERA_PERMISSION, true);
-                    editor.apply();
+                    savePermissionState(true);
                 } else {
                     Toast.makeText(this, R.string.error_no_camera_permission,
                             Toast.LENGTH_SHORT).show();
+                    savePermissionState(false);
                 }
                 return;
         }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        getSupportFragmentManager().putFragment(outState, FRAGMENT_TAG, mCurrentFragment);
+    }
+
+    private void savePermissionState(boolean state){
+        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+        editor.putBoolean(CAMERA_PERMISSION, state);
+        editor.apply();
+    }
 }

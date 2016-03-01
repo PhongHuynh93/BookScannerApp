@@ -50,6 +50,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             loadBooksIfBarcodeValid();
         }
     };
+    private Cursor mData;
 
 
     public AddBook(){
@@ -70,10 +71,13 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//        if (savedInstanceState != null) {
-//            // Restore last state for checked position.
-//            ean.setText(savedInstanceState.getString(EAN_CONTENT));
-//        }
+        if (savedInstanceState != null) {
+            // Restore last state for checked position.
+            ean.setText(savedInstanceState.getString(EAN_CONTENT));
+            if(mData != null){
+                loadBookToUI(mData);
+            }
+        }
     }
 
     @Override
@@ -105,7 +109,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
                 //check if camera permission granted
                 SharedPreferences prefs = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, MainActivity.MODE_PRIVATE);
-                boolean permissionGranted = prefs.getBoolean(MainActivity.CAMERA_PERMISSION, false);
+                boolean permissionGranted = prefs.getBoolean(MainActivity.CAMERA_PERMISSION, true);
                 if(permissionGranted){
                     Intent scanIntent = new Intent (getActivity(), ScannerActivity.class);
                     //the requestCode is changed by the Activity that owns the Fragment, so need to call getActivity()
@@ -216,6 +220,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         }
         String eanStr= ean.getText().toString();
         eanStr = Utility.fixISBN10(eanStr);
+        mData = null;
 
         return new CursorLoader(
                 getActivity(),
@@ -233,6 +238,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             return;
         }
         loadBookToUI(data);
+        mData = data;
     }
 
 
