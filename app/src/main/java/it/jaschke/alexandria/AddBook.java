@@ -245,15 +245,28 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     private void loadBookToUI(Cursor data){
         if(data != null){
             String bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
-            ((TextView) rootView.findViewById(R.id.bookTitle)).setText(bookTitle);
+            if(bookTitle != null) {
+                ((TextView) rootView.findViewById(R.id.bookTitle)).setText(bookTitle);
+            } else {
+                ((TextView) rootView.findViewById(R.id.bookTitle)).setText(R.string.no_data_title);
+            }
 
             String bookSubTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
-            ((TextView) rootView.findViewById(R.id.bookSubTitle)).setText(bookSubTitle);
+            if(bookSubTitle != null){
+                ((TextView) rootView.findViewById(R.id.bookSubTitle)).setText(bookSubTitle);
+            } else {
+                ((TextView) rootView.findViewById(R.id.bookTitle)).setText(R.string.no_data_subtitle);
+            }
 
             String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
-            String[] authorsArr = authors.split(",");
-            ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
-            ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
+            if(authors != null){
+                String[] authorsArr = authors.split(",");
+                ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
+                ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
+            }else {
+                ((TextView) rootView.findViewById(R.id.authors)).setText(R.string.no_data_author);
+            }
+
             String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
             if(Patterns.WEB_URL.matcher(imgUrl).matches()){
                 new DownloadImage((ImageView) rootView.findViewById(R.id.bookCover)).execute(imgUrl);
@@ -261,7 +274,11 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             }
 
             String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
-            ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
+           if(categories != null){
+               ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
+           } else{
+               ((TextView) rootView.findViewById(R.id.categories)).setText(R.string.no_data_categories);
+           }
 
             rootView.findViewById(R.id.save_button).setVisibility(View.VISIBLE);
             rootView.findViewById(R.id.delete_button).setVisibility(View.VISIBLE);

@@ -41,4 +41,12 @@
     <string name="prefs_result_barcode_default_value" translatable="false">No barcode</string>
     <string name="prefs_result_format_default_value" translatable="false">No barcode</string>
 
+
+    <!-- No data strings -->
+    <string name="no_data_subtitle">No subtitle</string>
+    <string name="no_data_description">No description for this book</string>
+    <string name="no_data_author">No information about the author</string>
+    <string name="no_data_categories">No categories</string>
+    <string name="no_data_title">This book has no title</string>
+
 </resources>
