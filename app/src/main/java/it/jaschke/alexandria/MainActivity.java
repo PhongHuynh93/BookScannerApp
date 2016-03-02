@@ -105,7 +105,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
         fragmentManager.beginTransaction()
                 .replace(R.id.container, nextFragment)
-                .addToBackStack((String) title)
                 .commit();
     }
 
@@ -169,7 +168,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             }
             getSupportFragmentManager().beginTransaction()
                     .replace(id, fragment)
-                    .addToBackStack(getString(R.string.book_detail_title))
                     .commit();
         }else {
             Intent intent = new Intent(this, BookDetailActivity.class);
