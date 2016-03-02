@@ -48,5 +48,6 @@
     <string name="no_data_author">No information about the author</string>
     <string name="no_data_categories">No categories</string>
     <string name="no_data_title">This book has no title</string>
+    <string name="boo_details_activity_label">Book Details</string>
 
 </resources>

@@ -51,18 +51,26 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
             ean = arguments.getString(BookDetail.EAN_KEY);
             getLoaderManager().restartLoader(LOADER_ID, null, this);
         }
+        if(ean == null){
+            //get the book data from the Intent
+            Intent intent = getActivity().getIntent();
+            ean = intent.getStringExtra(BookDetail.EAN_KEY);
+            getLoaderManager().restartLoader(LOADER_ID, null, this);
+        }
 
-        rootView = inflater.inflate(R.layout.fragment_full_book, container, false);
-        rootView.findViewById(R.id.delete_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent bookIntent = new Intent(getActivity(), BookService.class);
-                bookIntent.putExtra(BookService.EAN, ean);
-                bookIntent.setAction(BookService.DELETE_BOOK);
-                getActivity().startService(bookIntent);
-                getActivity().getSupportFragmentManager().popBackStack();
-            }
-        });
+        if (ean != null) {
+            rootView = inflater.inflate(R.layout.fragment_full_book, container, false);
+            rootView.findViewById(R.id.delete_button).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent bookIntent = new Intent(getActivity(), BookService.class);
+                    bookIntent.putExtra(BookService.EAN, ean);
+                    bookIntent.setAction(BookService.DELETE_BOOK);
+                    getActivity().startService(bookIntent);
+                    getActivity().getSupportFragmentManager().popBackStack();
+                }
+            });
+        }
         return rootView;
     }
 
@@ -152,9 +160,9 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
             ((TextView) rootView.findViewById(R.id.categories)).setText(R.string.no_data_categories);
         }
 
-        if (rootView.findViewById(R.id.right_container) != null) {
-            rootView.findViewById(R.id.backButton).setVisibility(View.INVISIBLE);
-        }
+//        if (rootView.findViewById(R.id.right_container) != null) {
+//            rootView.findViewById(R.id.backButton).setVisibility(View.INVISIBLE);
+//        }
 
     }
 

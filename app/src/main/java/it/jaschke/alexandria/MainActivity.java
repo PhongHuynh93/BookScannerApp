@@ -20,7 +20,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import it.jaschke.alexandria.CameraPreview.ScannerActivity;
@@ -158,20 +157,25 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     @Override
     public void onItemSelected(String ean) {
-        Bundle args = new Bundle();
-        args.putString(BookDetail.EAN_KEY, ean);
+        if(IS_TABLET) {
+            Bundle args = new Bundle();
+            args.putString(BookDetail.EAN_KEY, ean);
 
-        BookDetail fragment = new BookDetail();
-        fragment.setArguments(args);
-
-        int id = R.id.container;
-        if (findViewById(R.id.right_container) != null) {
-            id = R.id.right_container;
+            BookDetail fragment = new BookDetail();
+            fragment.setArguments(args);
+            int id = R.id.container;
+            if (findViewById(R.id.right_container) != null) {
+                id = R.id.right_container;
+            }
+            getSupportFragmentManager().beginTransaction()
+                    .replace(id, fragment)
+                    .addToBackStack(getString(R.string.book_detail_title))
+                    .commit();
+        }else {
+            Intent intent = new Intent(this, BookDetailActivity.class);
+            intent.putExtra(BookDetail.EAN_KEY, ean);
+            startActivity(intent);
         }
-        getSupportFragmentManager().beginTransaction()
-                .replace(id, fragment)
-                .addToBackStack(getString(R.string.book_detail_title))
-                .commit();
 
     }
 
@@ -184,9 +188,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }
     }
 
-    public void goBack(View view) {
-        getSupportFragmentManager().popBackStack();
-    }
 
     private boolean isTablet() {
         return (getApplicationContext().getResources().getConfiguration().screenLayout
@@ -194,13 +195,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
-    @Override
-    public void onBackPressed() {
-        if (getSupportFragmentManager().getBackStackEntryCount() < 2) {
-            finish();
-        }
-        super.onBackPressed();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
